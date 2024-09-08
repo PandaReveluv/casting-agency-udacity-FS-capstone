@@ -1,27 +1,20 @@
+import datetime
 import logging
 import os
 from json import JSONDecodeError
 
+import jwt
 from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
 
-from database.models import setup_db
-from auth.auth import AuthError, requires_auth
+from database.models import setup_db, Actor, Movie
+from auth.auth import AuthError, requires_auth, JWT_SECRET
 
 app = Flask(__name__)
 setup_db(app)
 CORS(app)
-
-
-'''
-@TODO uncomment the following line to initialize the datbase
-!! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
-!! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
-!! Running this funciton will add one
-'''
-# db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -34,13 +27,22 @@ CORS(app)
 '''
 
 
-@app.route('/drinks', methods=['GET'])
-def get_drinks():
-    query_results = Drink.query.all()
-    short_recipe_drinks = [drink.short() for drink in query_results]
+@app.route('/actors', methods=['GET'])
+@requires_auth(permission="read:actor")
+def get_actors():
+    query_results = Actor.query.all()
+    actors = [actor.format() for actor in query_results]
     return jsonify({"success": True,
-                    "drinks": short_recipe_drinks})
+                    "actors": actors})
 
+
+@app.route('/movies', methods=['GET'])
+@requires_auth(permission="read:movie")
+def get_movies():
+    query_results = Movie.query.all()
+    movies = [movie.format() for movie in query_results]
+    return jsonify({"success": True,
+                    "movies": movies})
 
 '''
 @TODO implement endpoint
@@ -50,15 +52,6 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-
-
-@app.route('/drinks-detail', methods=['GET'])
-@requires_auth(permission="get:drinks-detail")
-def get_drinks_detail():
-    query_results = Drink.query.all()
-    long_recipe_drinks = [drink.long() for drink in query_results]
-    return jsonify({"success": True,
-                    "drinks": long_recipe_drinks})
 
 
 '''
@@ -72,32 +65,45 @@ def get_drinks_detail():
 '''
 
 
-@app.route('/drinks', methods=['POST'])
-@requires_auth(permission="post:drinks")
-def create_drink():
+@app.route('/actor', methods=['POST'])
+@requires_auth(permission="create:actor")
+def create_actor():
     request_body = request.get_json()
-    recipes = request_body.get('recipe', None)
-    title = request_body.get('title', None)
-    drink = Drink()
-    drink.recipe = json.dumps(recipes)
-    drink.title = title
+    name = request_body.get('name', None)
+    age = request_body.get('age', None)
+    gender = request_body.get('gender', None)
+    actor = Actor(name, age, gender)
     try:
-        if not drink.is_long_recipe():
-            logging.error('Invalid data representation')
-            abort(status=400)
-        drink.insert()
+        actor.insert()
     except (JSONDecodeError, TypeError) as json_error:
         logging.error('Invalid request body: %s', repr(json_error))
         abort(status=400)
     except exc.SQLAlchemyError as e:
-        logging.error('Error at creating drink: %s', repr(e))
-        drink.rollback()
+        logging.error('Error at creating actor: %s', repr(e))
+        actor.rollback()
         abort(status=500)
-    result = list()
-    result.append(drink.long())
     return jsonify({"success": True,
-                    "drinks": result})
+                    "actor": actor.format()})
 
+
+@app.route('/movie', methods=['POST'])
+@requires_auth(permission="create:movie")
+def create_movie():
+    request_body = request.get_json()
+    title = request_body.get('title', None)
+    release_date = request_body.get('release_date', None)
+    movie = Movie(title, release_date)
+    try:
+        movie.insert()
+    except (JSONDecodeError, TypeError) as json_error:
+        logging.error('Invalid request body: %s', repr(json_error))
+        abort(status=400)
+    except exc.SQLAlchemyError as e:
+        logging.error('Error at creating movie: %s', repr(e))
+        movie.rollback()
+        abort(status=500)
+    return jsonify({"success": True,
+                    "movie": movie.format()})
 
 '''
 @TODO implement endpoint
@@ -112,36 +118,61 @@ def create_drink():
 '''
 
 
-@app.route('/drinks/<drink_id>', methods=['PATCH'])
-@requires_auth(permission="patch:drinks")
-def update_drink(drink_id):
-    drink = Drink.query.filter(Drink.id == drink_id).one()
-    if drink is None:
+@app.route('/actor/<actor_id>', methods=['PATCH'])
+@requires_auth(permission="edit:actor")
+def update_actor(actor_id):
+    actor = Actor.query.filter(Actor.id == actor_id).one()
+    if actor is None:
         abort(status=404)
 
     request_body = request.get_json()
-    recipes = request_body.get('recipe', None)
-    title = request_body.get('title', None)
-    if recipes is not None:
-        drink.recipe = json.dumps(recipes)
-    if title is not None:
-        drink.title = title
+    name = request_body.get('name', None)
+    age = request_body.get('age', None)
+    gender = request_body.get('gender', None)
+    if name is not None:
+        actor.name = name
+    if age is not None:
+        actor.age = age
+    if gender is not None:
+        actor.gender = gender
     try:
-        if drink.recipe is not None and not drink.is_long_recipe():
-            logging.error('Invalid data representation')
-            abort(status=400)
-        drink.update()
+        actor.update()
     except (JSONDecodeError, TypeError) as json_error:
         logging.error('Invalid request body: %s', repr(json_error))
         abort(status=400)
     except exc.SQLAlchemyError as e:
-        logging.error('Error at updating drink: %s', repr(e))
-        drink.rollback()
+        logging.error('Error at updating actor: %s', repr(e))
+        actor.rollback()
         abort(status=500)
-    result = list()
-    result.append(drink.long())
     return jsonify({"success": True,
-                    "drinks": result})
+                    "actor": actor.format()})
+
+
+@app.route('/movie/<movie_id>', methods=['PATCH'])
+@requires_auth(permission="edit:movie")
+def update_movie(movie_id):
+    movie = Movie.query.filter(Movie.id == movie_id).one()
+    if movie is None:
+        abort(status=404)
+
+    request_body = request.get_json()
+    title = request_body.get('title', None)
+    release_date = request_body.get('release_date', None)
+    if title is not None:
+        movie.title = title
+    if release_date is not None:
+        movie.release_date = release_date
+    try:
+        movie.update()
+    except (JSONDecodeError, TypeError) as json_error:
+        logging.error('Invalid request body: %s', repr(json_error))
+        abort(status=400)
+    except exc.SQLAlchemyError as e:
+        logging.error('Error at updating movie: %s', repr(e))
+        movie.rollback()
+        abort(status=500)
+    return jsonify({"success": True,
+                    "actor": movie.format()})
 
 
 '''
@@ -156,20 +187,36 @@ def update_drink(drink_id):
 '''
 
 
-@app.route('/drinks/<drink_id>', methods=['DELETE'])
-@requires_auth(permission="delete:drinks")
-def delete_drink(drink_id):
-    drink = Drink.query.filter(Drink.id == drink_id).one()
-    if drink is None:
+@app.route('/actor/<actor_id>', methods=['DELETE'])
+@requires_auth(permission="delete:actor")
+def delete_actor(actor_id):
+    actor = Actor.query.filter(Actor.id == actor_id).one()
+    if actor is None:
         abort(status=404)
     try:
-        drink.delete()
+        actor.delete()
     except exc.SQLAlchemyError as e:
-        logging.error('Error at updating drink: %s', repr(e))
-        drink.rollback()
+        logging.error('Error at deleting actor: %s', repr(e))
+        actor.rollback()
         abort(status=500)
     return jsonify({"success": True,
-                    "delete": drink_id})
+                    "delete": actor_id})
+
+
+@app.route('/movie/<movie_id>', methods=['DELETE'])
+@requires_auth(permission="delete:movie")
+def delete_movie(movie_id):
+    movie = Movie.query.filter(Movie.id == movie_id).one()
+    if movie is None:
+        abort(status=404)
+    try:
+        movie.delete()
+    except exc.SQLAlchemyError as e:
+        logging.error('Error at deleting movie: %s', repr(e))
+        movie.rollback()
+        abort(status=500)
+    return jsonify({"success": True,
+                    "delete": movie_id})
 
 
 # Error Handling

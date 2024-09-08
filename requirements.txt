@@ -21,3 +21,4 @@ SQLAlchemy==1.4.41
 python-dotenv==0.21.1
 Flask-Migrate==2.5.0
 psycopg2-binary==2.8.2
+pyjwt==1.7.1

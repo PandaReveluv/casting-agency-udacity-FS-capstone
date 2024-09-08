@@ -1,4 +1,6 @@
 import json
+import os
+
 from flask import request, _request_ctx_stack
 from functools import wraps
 from jose import jwt
@@ -6,7 +8,8 @@ from urllib.request import urlopen
 
 AUTH0_DOMAIN = 'dev-flv3ciromptdhtxi.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'drink'
+API_AUDIENCE = 'casting-agency'
+JWT_SECRET = os.getenv('JWT_SECRET', 'my_secret')
 
 ## AuthError Exception
 '''
