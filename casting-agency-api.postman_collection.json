@@ -1,0 +1,465 @@
+{
+	"info": {
+		"_postman_id": "369fec66-245f-499a-8fc9-ee82d83709f2",
+		"name": "casting-agency-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37610661"
+	},
+	"item": [
+		{
+			"name": "Casting Assistant",
+			"item": [
+				{
+					"name": "/actors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/actors",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/movies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/movies",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"movies"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlBTUExzeXE2WDdWeFd3dEVMX1E2QiJ9.eyJpc3MiOiJodHRwczovL2Rldi1mbHYzY2lyb21wdGRodHhpLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2NmRjOGU5NzM1YTQyZDM3MDkzZTBjZTciLCJhdWQiOiJjYXN0aW5nLWFnZW5jeSIsImlhdCI6MTcyNTgwNDIzOCwiZXhwIjoxNzI1ODExNDM4LCJzY29wZSI6IiIsImF6cCI6IkV4bzRudUxzWW1jd05wTGhpMzFwRWQ5NTRNTzJudm9XIiwicGVybWlzc2lvbnMiOlsicmVhZDphY3RvciIsInJlYWQ6bW92aWUiXX0.Vl-l3f__M0AXba69X7c6XwNGT8ezif13c3Oslpw4yG1EamkzLjYe4IOoJO0weByZUXX0OoyQupklVQvxp87turQ9cvWdXnZ1G_ASuyYHul6_0gsOeyX0LqUihmNvL454Y6wUO7JDeaE1Sn-gb0q4I0C8wSCGIxV9Mr0c705FHANduuSLf7VIjGLCeC7FIR150nGWRaI-VZxEKDC7AKcj-aHMBuEFTxBTTTHABX5osNTegcZQOWcHpMCHZ0_WMAkZjpbczcj7nkLx5cgHILGIFwPX2pxm8YS7K0WmiOVADG2EIx-1rKThEvcjkaZGaLP33fGK1q3J2HqLQ-vSivSMdw",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Casting Director",
+			"item": [
+				{
+					"name": "/actors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/actors",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/actor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test2\",\r\n    \"age\": 56,\r\n    \"gender\": \"Female\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/actor",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/actor",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test2\",\r\n    \"age\": 46,\r\n    \"gender\": \"Female\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/actor/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actor",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/actor",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/actor/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actor",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/movies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/movies",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"movies"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlBTUExzeXE2WDdWeFd3dEVMX1E2QiJ9.eyJpc3MiOiJodHRwczovL2Rldi1mbHYzY2lyb21wdGRodHhpLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2NmRkYjU2NmRiZWJhOGFkN2FlNTcxYjgiLCJhdWQiOiJjYXN0aW5nLWFnZW5jeSIsImlhdCI6MTcyNTgwNjIzNywiZXhwIjoxNzI1ODkyNjM3LCJzY29wZSI6IiIsImF6cCI6IkV4bzRudUxzWW1jd05wTGhpMzFwRWQ5NTRNTzJudm9XIiwicGVybWlzc2lvbnMiOlsiY3JlYXRlOmFjdG9yIiwiZGVsZXRlOmFjdG9yIiwiZWRpdDphY3RvciIsImVkaXQ6bW92aWUiLCJyZWFkOmFjdG9yIiwicmVhZDptb3ZpZSJdfQ.mOrURmjPv_ti7P4bLI4pKdcDlPVrShrTH20zI_wnxm8aRnfwsC982RXKGKa_wAgS-GsVQ2iNEzzmrcfwtTKHvyiNkA6flqobIpZofVLIGeaCvQXAC6rZE_ccQVpP_et8ZduFQ4EXcoZO28C8kiMxdogJYrJc7w4V8KlN--fDsdVJAd364AE8e1nf5c5YkECsXIhc3QExj78HTlfs28PkxkbP6XxtgGQgOg3O3O_p-VgWoo_xbmPAsRUXOWYH60226uBIg51c1IyeJB95-gqmv-qQPSd729q3W45OP8eEh0nzH30bRvYNnyO-1gMeld-Ll9BrI6bhWcNpSDs5gEXgUg",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Executive Producer",
+			"item": [
+				{
+					"name": "/actors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/actors",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/actor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test2\",\r\n    \"age\": 56,\r\n    \"gender\": \"Female\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/actor",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/actor/{id}",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test2\",\r\n    \"age\": 46,\r\n    \"gender\": \"Female\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/actor/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actor",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/actor/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/actor/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actor",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/movies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/movies",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"movies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/movie",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Movie2\",\r\n    \"release_date\": \"2024-09-07 21:39:45.859\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/movie",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"movie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/movie/{id}",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Edited\",\r\n    \"release_date\": \"2024-09-08 21:39:45.859\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/movie/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"movie",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/movie/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/movie/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"movie",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlBTUExzeXE2WDdWeFd3dEVMX1E2QiJ9.eyJpc3MiOiJodHRwczovL2Rldi1mbHYzY2lyb21wdGRodHhpLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2NmRkYmJhODY5ODQ5YTdjYmRhZDNhNjkiLCJhdWQiOiJjYXN0aW5nLWFnZW5jeSIsImlhdCI6MTcyNTgwNzU4MywiZXhwIjoxNzI1ODkzOTgzLCJzY29wZSI6IiIsImF6cCI6IkV4bzRudUxzWW1jd05wTGhpMzFwRWQ5NTRNTzJudm9XIiwicGVybWlzc2lvbnMiOlsiY3JlYXRlOmFjdG9yIiwiY3JlYXRlOm1vdmllIiwiZGVsZXRlOmFjdG9yIiwiZGVsZXRlOm1vdmllIiwiZWRpdDphY3RvciIsImVkaXQ6bW92aWUiLCJyZWFkOmFjdG9yIiwicmVhZDptb3ZpZSJdfQ.mYiINLtSio1nwAzKY9D_Tz5wYA8pp19GaNqm44M7jIjvCTjwz_SoO7cZzJoW9CwIqL9ekj4CKisKBP4-nrlknCWyPBqvCgvTN-MMukGlVXDxULbc7q551saLnmsDth63yRMOFbxdhnUMW7OaCDArKJ_T79F_5FvI9_XIQbTHspq0GZqOpRUjNj5SxY-WZY0Cx5UQCGwsGoS7AdjjXNQEumsLllAWpcK1wPavphZDhJo2rX9YiLskIOIg5ne7fS76bs2AR9zLhLyiXbpQfDtD4Nmjs6hRat_CgJgwGz9kqgpp2pUiXgSobFGXh4gDAoJW9xwS-i-54JFPuXTbfdFd9Q",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	]
+}
