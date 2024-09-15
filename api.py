@@ -70,6 +70,8 @@ def get_movies():
 @requires_auth(permission=PERMISSION_CREATE_ACTOR)
 def create_actor():
     request_body = request.get_json()
+    if request_body is None:
+        abort(400)
     name = request_body.get('name', None)
     age = request_body.get('age', None)
     gender = request_body.get('gender', None)
@@ -91,6 +93,8 @@ def create_actor():
 @requires_auth(permission=PERMISSION_CREATE_MOVIE)
 def create_movie():
     request_body = request.get_json()
+    if request_body is None:
+        abort(400)
     title = request_body.get('title', None)
     release_date = request_body.get('release_date', None)
     movie = Movie(title, release_date)

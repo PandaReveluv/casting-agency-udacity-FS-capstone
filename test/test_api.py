@@ -73,15 +73,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data["actors"])
 
-    def test_get_actors_when_authorization_is_missing_return_401(self):
-        res = self.client().get(
-            "/actors"
-        )
-        data = json.loads(res.data)
-
-        self.assertEqual(res.status_code, 401)
-        self.assertEqual(data["message"], "Authorization header is expected.")
-
     def test_get_actors_when_not_allow_permission_return_403(self):
         mock_jwt_token = patch('auth.auth.verify_decode_jwt',
                                return_value={
@@ -102,6 +93,15 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 403)
         self.assertEqual(data["message"], "Invalid permission.")
+
+    def test_get_actors_when_authorization_is_missing_return_401(self):
+        res = self.client().get(
+            "/actors"
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["message"], "Authorization header is expected.")
 
     def test_get_movies_return_200_OK(self):
         mock_jwt_token = patch('auth.auth.verify_decode_jwt',
@@ -124,15 +124,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data["movies"])
 
-    def test_get_movies_when_authorization_is_missing_return_401(self):
-        res = self.client().get(
-            "/movies"
-        )
-        data = json.loads(res.data)
-
-        self.assertEqual(res.status_code, 401)
-        self.assertEqual(data["message"], "Authorization header is expected.")
-
     def test_get_movies_when_not_allow_permission_return_403(self):
         mock_jwt_token = patch('auth.auth.verify_decode_jwt',
                                return_value={
@@ -154,7 +145,18 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 403)
         self.assertEqual(data["message"], "Invalid permission.")
 
-    def test_create_actors_return_200_OK(self):
+    def test_get_movies_when_authorization_is_missing_return_401(self):
+        res = self.client().get(
+            "/movies"
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["message"], "Authorization header is expected.")
+
+
+
+    def test_create_actor_return_200_OK(self):
         mock_jwt_token = patch('auth.auth.verify_decode_jwt',
                                return_value={
                                    'user_id': "dummy",
@@ -175,6 +177,119 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['actor']['name'])
         self.assertTrue(data['actor']['age'])
         self.assertTrue(data['actor']['gender'])
+
+    def test_create_actor_when_invalid_body_return_400(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_CREATE_ACTOR
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().post(
+            "/actor",
+            headers={
+                'Authorization': 'Bearer dummy',
+            },
+            json=None)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['message'], "Invalid request")
+
+    def test_create_actor_when_not_allow_permission_return_403(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       "Dummy Permission"
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().post(
+            "/actor",
+            headers={
+                'Authorization': 'Bearer dummy',
+            },
+            json=self.new_actor)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["message"], "Invalid permission.")
+
+    def test_create_actor_when_authorization_is_missing_return_401(self):
+        res = self.client().post(
+            "/actor",
+            json=self.new_actor)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["message"], "Authorization header is expected.")
+
+    def test_create_movie_return_200_OK(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_CREATE_MOVIE
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().post(
+            "/movie",
+            headers={
+                'Authorization': 'Bearer dummy',
+            },
+            json=self.new_movie)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['movie']['id'])
+        self.assertTrue(data['movie']['title'])
+        self.assertTrue(data['movie']['release_data'])
+
+    def test_create_movie_when_invalid_body_return_400(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_CREATE_MOVIE
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().post(
+            "/movie",
+            headers={
+                'Authorization': 'Bearer dummy',
+            },
+            json=None)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['message'], "Invalid request")
+
+    def test_create_movie_when_not_allow_permission_return_403(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       "Dummy Permission"
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().post(
+            "/movie",
+            headers={
+                'Authorization': 'Bearer dummy',
+            },
+            json=self.new_movie)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["message"], "Invalid permission.")
+
+    def test_create_movie_when_authorization_is_missing_return_401(self):
+        res = self.client().post(
+            "/movie",
+            json=self.new_movie)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["message"], "Authorization header is expected.")
 
     def test_get_pagination_questions(self):
         res = self.client().get("/questions?page=1")
