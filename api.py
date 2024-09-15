@@ -9,6 +9,7 @@ from sqlalchemy import exc
 import json
 from flask_cors import CORS
 
+from constant.constant import *
 from database.models import setup_db, Actor, Movie
 from auth.auth import AuthError, requires_auth, JWT_SECRET
 
@@ -28,7 +29,7 @@ CORS(app)
 
 
 @app.route('/actors', methods=['GET'])
-@requires_auth(permission="read:actor")
+@requires_auth(permission=PERMISSION_READ_ACTOR)
 def get_actors():
     query_results = Actor.query.all()
     actors = [actor.format() for actor in query_results]
@@ -37,7 +38,7 @@ def get_actors():
 
 
 @app.route('/movies', methods=['GET'])
-@requires_auth(permission="read:movie")
+@requires_auth(permission=PERMISSION_READ_MOVIE)
 def get_movies():
     query_results = Movie.query.all()
     movies = [movie.format() for movie in query_results]
@@ -66,7 +67,7 @@ def get_movies():
 
 
 @app.route('/actor', methods=['POST'])
-@requires_auth(permission="create:actor")
+@requires_auth(permission=PERMISSION_CREATE_ACTOR)
 def create_actor():
     request_body = request.get_json()
     name = request_body.get('name', None)
@@ -87,7 +88,7 @@ def create_actor():
 
 
 @app.route('/movie', methods=['POST'])
-@requires_auth(permission="create:movie")
+@requires_auth(permission=PERMISSION_CREATE_MOVIE)
 def create_movie():
     request_body = request.get_json()
     title = request_body.get('title', None)
@@ -119,7 +120,7 @@ def create_movie():
 
 
 @app.route('/actor/<actor_id>', methods=['PATCH'])
-@requires_auth(permission="edit:actor")
+@requires_auth(permission=PERMISSION_EDIT_ACTOR)
 def update_actor(actor_id):
     actor = Actor.query.filter(Actor.id == actor_id).one()
     if actor is None:
@@ -149,7 +150,7 @@ def update_actor(actor_id):
 
 
 @app.route('/movie/<movie_id>', methods=['PATCH'])
-@requires_auth(permission="edit:movie")
+@requires_auth(permission=PERMISSION_EDIT_MOVIE)
 def update_movie(movie_id):
     movie = Movie.query.filter(Movie.id == movie_id).one()
     if movie is None:
@@ -188,7 +189,7 @@ def update_movie(movie_id):
 
 
 @app.route('/actor/<actor_id>', methods=['DELETE'])
-@requires_auth(permission="delete:actor")
+@requires_auth(permission=PERMISSION_DELETE_ACTOR)
 def delete_actor(actor_id):
     actor = Actor.query.filter(Actor.id == actor_id).one()
     if actor is None:
@@ -204,7 +205,7 @@ def delete_actor(actor_id):
 
 
 @app.route('/movie/<movie_id>', methods=['DELETE'])
-@requires_auth(permission="delete:movie")
+@requires_auth(permission=PERMISSION_DELETE_MOVIE)
 def delete_movie(movie_id):
     movie = Movie.query.filter(Movie.id == movie_id).one()
     if movie is None:

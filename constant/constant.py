@@ -1,0 +1,8 @@
+PERMISSION_READ_ACTOR = "read:actor"
+PERMISSION_READ_MOVIE = "read:movie"
+PERMISSION_CREATE_ACTOR = "create:actor"
+PERMISSION_CREATE_MOVIE = "create:movie"
+PERMISSION_EDIT_ACTOR = "edit:actor"
+PERMISSION_EDIT_MOVIE = "edit:movie"
+PERMISSION_DELETE_ACTOR = "delete:actor"
+PERMISSION_DELETE_MOVIE = "delete:movie"
