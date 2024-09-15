@@ -1,17 +1,13 @@
-import datetime
 import logging
-import os
 from json import JSONDecodeError
 
-import jwt
 from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
-import json
 from flask_cors import CORS
 
 from constant.constant import *
 from database.models import setup_db, Actor, Movie
-from auth.auth import AuthError, requires_auth, JWT_SECRET
+from auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
 setup_db(app)
@@ -19,18 +15,24 @@ CORS(app)
 
 # ROUTES
 '''
-@TODO implement endpoint
-    GET /drinks
+    GET /health
         it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+        it should return health status of web service
 '''
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({"success": True,
                     "status": "OK"})
+
+
+'''
+    GET /actors
+        it should be a private endpoint
+        it should return list of actors
+'''
+
 
 @app.route('/actors', methods=['GET'])
 @requires_auth(permission=PERMISSION_READ_ACTOR)
@@ -41,6 +43,13 @@ def get_actors():
                     "actors": actors})
 
 
+'''
+    GET /movies
+        it should be a private endpoint
+        it should return list of movies
+'''
+
+
 @app.route('/movies', methods=['GET'])
 @requires_auth(permission=PERMISSION_READ_MOVIE)
 def get_movies():
@@ -49,24 +58,12 @@ def get_movies():
     return jsonify({"success": True,
                     "movies": movies})
 
-'''
-@TODO implement endpoint
-    GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
-
 
 '''
-@TODO implement endpoint
-    POST /drinks
-        it should create a new row in the drinks table
-        it should require the 'post:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
+    POST /actor
+        it should be a private endpoint
+        it should receive request body contains "name", "age", "gender"
+        it should return the result of creating new actor
 '''
 
 
@@ -93,6 +90,14 @@ def create_actor():
                     "actor": actor.format()})
 
 
+'''
+    POST /movie
+        it should be a private endpoint
+        it should receive request body contains "title", "release_date"
+        it should return the result of creating new movie
+'''
+
+
 @app.route('/movie', methods=['POST'])
 @requires_auth(permission=PERMISSION_CREATE_MOVIE)
 def create_movie():
@@ -114,16 +119,12 @@ def create_movie():
     return jsonify({"success": True,
                     "movie": movie.format()})
 
+
 '''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
+    PATCH /actor/{actor_id}
+        it should be a private endpoint
+        it should receive request body contains contains "name", "age", "gender" with request param "actor_id"
+        it should return the result of updating existing actor
 '''
 
 
@@ -162,6 +163,14 @@ def update_actor(actor_id):
                     "actor": actor.format()})
 
 
+'''
+    PATCH /movie/{movie_id}
+        it should be a private endpoint
+        it should receive request body contains "title", "release_date" with request param "movie_id"
+        it should return the result of updating existing movie
+'''
+
+
 @app.route('/movie/<movie_id>', methods=['PATCH'])
 @requires_auth(permission=PERMISSION_EDIT_MOVIE)
 def update_movie(movie_id):
@@ -195,14 +204,10 @@ def update_movie(movie_id):
 
 
 '''
-@TODO implement endpoint
-    DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
+    DELETE /actor/{actor_id}
+        it should be a private endpoint
+        it should receive request param "actor_id"
+        it should return the result of deleting existing actor
 '''
 
 
@@ -222,6 +227,14 @@ def delete_actor(actor_id):
         abort(status=500)
     return jsonify({"success": True,
                     "delete": actor_id})
+
+
+'''
+    DELETE /movie/{movie_id}
+        it should be a private endpoint
+        it should receive request param "movie_id"
+        it should return the result of deleting existing movie
+'''
 
 
 @app.route('/movie/<movie_id>', methods=['DELETE'])

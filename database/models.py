@@ -32,6 +32,7 @@ def setup_db(app):
     db.init_app(app)
     migrate = Migrate(app, db)
 
+
 '''
 Movie
 a persistent movie entity, extends the base SQLAlchemy Model
@@ -74,8 +75,11 @@ class Movie(db.Model):
         db.session.query(Movie).delete()
         db.session.commit()
 
-    def __repr__(self):
-        return json.dumps(self.short())
+
+'''
+Actor
+a persistent actor entity, extends the base SQLAlchemy Model
+'''
 
 
 class Actor(db.Model):
@@ -116,6 +120,3 @@ class Actor(db.Model):
     def clean_all_data(self):
         db.session.query(Actor).delete()
         db.session.commit()
-
-    def __repr__(self):
-        return json.dumps(self.short())
