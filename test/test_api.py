@@ -154,8 +154,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 401)
         self.assertEqual(data["message"], "Authorization header is expected.")
 
-
-
     def test_create_actor_return_200_OK(self):
         mock_jwt_token = patch('auth.auth.verify_decode_jwt',
                                return_value={
@@ -287,6 +285,102 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().post(
             "/movie",
             json=self.new_movie)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["message"], "Authorization header is expected.")
+
+    def test_edit_actor_return_200_OK(self):
+        to_be_edit_actor = {
+            "name": "Test2",
+            "age": 46,
+            "gender": "Female"
+        }
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_EDIT_ACTOR
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().patch(
+            "/actor/1",
+            headers={
+                'Authorization': 'Bearer dummy',
+            },
+            json=to_be_edit_actor)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['actor']['name'])
+        self.assertTrue(data['actor']['age'])
+        self.assertTrue(data['actor']['gender'])
+
+    def test_edit_actor_when_id_is_not_found_return_404(self):
+        to_be_edit_actor = {
+            "name": "Test2",
+            "age": 46,
+            "gender": "Female"
+        }
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_EDIT_ACTOR
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().patch(
+            "/actor/999",
+            headers={
+                'Authorization': 'Bearer dummy',
+            },
+            json=to_be_edit_actor)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['message'], "Resource not found")
+
+    def test_edit_actor_when_invalid_body_return_400(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_EDIT_ACTOR
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().patch(
+            "/actor/1",
+            headers={
+                'Authorization': 'Bearer dummy',
+            },
+            json=None)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['message'], "Invalid request")
+
+    def test_edit_actor_when_not_allow_permission_return_403(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       "Dummy Permission"
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().patch(
+            "/actor/1",
+            headers={
+                'Authorization': 'Bearer dummy',
+            },
+            json=self.new_actor)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["message"], "Invalid permission.")
+
+    def test_edit_actor_when_authorization_is_missing_return_401(self):
+        res = self.client().patch(
+            "/actor/1",
+            json=self.new_actor)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 401)
         self.assertEqual(data["message"], "Authorization header is expected.")

@@ -126,8 +126,10 @@ def create_movie():
 @app.route('/actor/<actor_id>', methods=['PATCH'])
 @requires_auth(permission=PERMISSION_EDIT_ACTOR)
 def update_actor(actor_id):
-    actor = Actor.query.filter(Actor.id == actor_id).one()
-    if actor is None:
+    try:
+        actor = Actor.query.filter(Actor.id == actor_id).one()
+    except (exc.NoResultFound, TypeError) as sql_error:
+        logging.error('Actor id %s is not found: %s', actor_id, repr(sql_error))
         abort(status=404)
 
     request_body = request.get_json()
@@ -156,8 +158,10 @@ def update_actor(actor_id):
 @app.route('/movie/<movie_id>', methods=['PATCH'])
 @requires_auth(permission=PERMISSION_EDIT_MOVIE)
 def update_movie(movie_id):
-    movie = Movie.query.filter(Movie.id == movie_id).one()
-    if movie is None:
+    try:
+        movie = Movie.query.filter(Movie.id == movie_id).one()
+    except (exc.NoResultFound, TypeError) as sql_error:
+        logging.error('Movie id %s is not found: %s', movie_id, repr(sql_error))
         abort(status=404)
 
     request_body = request.get_json()
@@ -261,7 +265,7 @@ def handle_not_found(error):
     return jsonify({
         "success": False,
         "error": 404,
-        "message": "resource not found"
+        "message": "Resource not found"
     }), 404
 
 
