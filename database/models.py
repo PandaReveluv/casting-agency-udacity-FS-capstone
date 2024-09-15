@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 
 load_dotenv()
-database_name = 'casting-agency'
+database_name = os.getenv('DATABASE_NAME')
 database_username = os.getenv('DATABASE_USERNAME')
 database_password = os.getenv('DATABASE_PASSWORD')
 database_url = os.getenv('DATABASE_URL')
