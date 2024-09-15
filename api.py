@@ -27,6 +27,10 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"success": True,
+                    "status": "OK"})
 
 @app.route('/actors', methods=['GET'])
 @requires_auth(permission=PERMISSION_READ_ACTOR)
