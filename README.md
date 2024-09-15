@@ -169,6 +169,8 @@
 
 ## How to run local
 
+#### Run with Python 3.7
+
 #### Install pip requirements
 ```bash
 pip install -r requirements.txt
