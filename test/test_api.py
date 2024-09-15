@@ -4,14 +4,13 @@ import json
 from unittest.mock import patch
 
 import api
-from flask_sqlalchemy import SQLAlchemy
 
 from constant.constant import *
 from database.models import Movie, Actor
 from dotenv import load_dotenv
 
 
-class TriviaTestCase(unittest.TestCase):
+class CastingAgencyTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
     def setUp(self):
@@ -43,6 +42,15 @@ class TriviaTestCase(unittest.TestCase):
             "release_date": "2024-09-07 21:39:45.859"
         }
 
+        if Movie.query.get(1) is None:
+            init_movie = Movie("Title", "2024-09-07 21:39:45.859")
+            init_movie.id = 1
+            init_movie.insert()
+        if Actor.query.get(1) is None:
+            init_actor = Actor("Actor", 20, "Male")
+            init_actor.id = 1
+            init_actor.insert()
+
     def tearDown(self):
         """Executed after reach test"""
         pass
@@ -51,6 +59,16 @@ class TriviaTestCase(unittest.TestCase):
     TODO
     Write at least one test for each test for successful operation and for expected errors.
     """
+
+    def prepare_data_for_delete(self):
+        init_actor = Actor("InitName", 20, "Male")
+        init_actor.id = 404
+        init_actor.clean_all_data()
+        init_actor.insert()
+        init_movie = Movie("InitTitle", "2024-09-07 21:39:45.859")
+        init_movie.id = 404
+        init_movie.clean_all_data()
+        init_movie.insert()
 
     def test_get_actors_return_200_OK(self):
         mock_jwt_token = patch('auth.auth.verify_decode_jwt',
@@ -241,7 +259,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['movie']['id'])
         self.assertTrue(data['movie']['title'])
-        self.assertTrue(data['movie']['release_data'])
+        self.assertTrue(data['movie']['release_date'])
 
     def test_create_movie_when_invalid_body_return_400(self):
         mock_jwt_token = patch('auth.auth.verify_decode_jwt',
@@ -478,86 +496,129 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 401)
         self.assertEqual(data["message"], "Authorization header is expected.")
 
-    def test_get_pagination_questions(self):
-        res = self.client().get("/questions?page=1")
-        data = json.loads(res.data)
-
-        self.assertEqual(res.status_code, 200)
-        self.assertTrue(data["questions"])
-        self.assertTrue(data["total_questions"])
-        self.assertTrue(data["categories"])
-        self.assertIsNone(data["currentCategory"])
-
-    def test_get_pagination_questions_not_found(self):
-        res = self.client().get("/questions?page=1000")
-        data = json.loads(res.data)
-
-        self.assertEqual(res.status_code, 404)
-        self.assertEqual(data["message"], "Not found")
-
-    def test_delete_question_by_id(self):
-        res = self.client().delete("/questions/1")
-        self.assertEqual(res.status_code, 204)
-
-    def test_delete_question_by_id_got_bad_request_error(self):
-        res = self.client().delete("/questions/dummy")
-        self.assertEqual(res.status_code, 400)
-
-    def test_create_question(self):
-        res = self.client().post("/question", json=self.new_question)
-        self.assertEqual(res.status_code, 204)
-
-    def test_create_question_got_unexpected_error(self):
-        error_question = self.new_question.copy()
-        error_question["category"] = 1000
-        res = self.client().post("/question", json=error_question)
-        self.assertEqual(res.status_code, 500)
-
-    def test_search_question(self):
-        res = self.client().post("/questions", json=self.search_term)
+    def test_delete_actor_return_200_OK(self):
+        self.prepare_data_for_delete()
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_DELETE_ACTOR
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().delete(
+            "/actor/404",
+            headers={
+                'Authorization': 'Bearer dummy',
+            })
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(data['questions'])
-        self.assertTrue(data['total_questions'])
-        self.assertIsNone(data['currentCategory'])
+        self.assertEqual(data['delete'], "404")
 
-    def test_search_question_not_found(self):
-        not_found_search_term = self.search_term.copy()
-        not_found_search_term['searchTerm'] = 'somedummysearchterm'
-        res = self.client().post("/questions", json=not_found_search_term)
+    def test_delete_actor_when_id_is_not_found_return_404(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_DELETE_ACTOR
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().delete(
+            "/actor/999",
+            headers={
+                'Authorization': 'Bearer dummy',
+            })
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
-        self.assertEqual(data["message"], "Not found")
+        self.assertEqual(data['message'], "Resource not found")
 
-    def test_get_questions_by_category_id(self):
-        res = self.client().get("/categories/1/questions")
+    def test_delete_actor_when_not_allow_permission_return_403(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       "Dummy Permission"
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().delete(
+            "/actor/1",
+            headers={
+                'Authorization': 'Bearer dummy',
+            })
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["message"], "Invalid permission.")
+
+    def test_delete_actor_when_authorization_is_missing_return_401(self):
+        res = self.client().delete(
+            "/actor/1")
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["message"], "Authorization header is expected.")
+
+    def test_delete_movie_return_200_OK(self):
+        self.prepare_data_for_delete()
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_DELETE_MOVIE
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().delete(
+            "/movie/404",
+            headers={
+                'Authorization': 'Bearer dummy',
+            })
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(data["questions"])
-        self.assertTrue(data["total_questions"])
-        self.assertTrue(data["currentCategory"])
+        self.assertEqual(data['delete'], "404")
 
-    def test_get_questions_by_category_id_got_bad_request(self):
-        res = self.client().get("/categories/dummy/questions")
-        self.assertEqual(res.status_code, 400)
-
-    def test_play_quiz(self):
-        res = self.client().post("/quizzes", json=self.quiz_body)
+    def test_delete_movie_when_id_is_not_found_return_404(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       PERMISSION_DELETE_MOVIE
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().delete(
+            "/movie/999",
+            headers={
+                'Authorization': 'Bearer dummy',
+            })
         data = json.loads(res.data)
-        self.assertEqual(res.status_code, 200)
-        self.assertTrue(data['question']['id'])
-        self.assertTrue(data['question']['question'])
-        self.assertTrue(data['question']['answer'])
-        self.assertTrue(data['question']['category'])
-        self.assertTrue(data['question']['difficulty'])
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['message'], "Resource not found")
 
-    def test_play_quiz_invalid_request_body(self):
-        invalid_request_body = self.quiz_body.copy()
-        invalid_request_body['previous_questions'] = None
-        res = self.client().post("/quizzes", json=invalid_request_body)
+    def test_delete_movie_when_not_allow_permission_return_403(self):
+        mock_jwt_token = patch('auth.auth.verify_decode_jwt',
+                               return_value={
+                                   'user_id': "dummy",
+                                   'permissions': [
+                                       "Dummy Permission"
+                                   ]
+                               })
+        mock_jwt_token.start()
+        res = self.client().delete(
+            "/movie/1",
+            headers={
+                'Authorization': 'Bearer dummy',
+            })
         data = json.loads(res.data)
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["message"], "Invalid permission.")
 
+    def test_delete_movie_when_authorization_is_missing_return_401(self):
+        res = self.client().delete(
+            "/movie/1")
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["message"], "Authorization header is expected.")
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

@@ -70,6 +70,10 @@ class Movie(db.Model):
     def rollback(self):
         db.session.rollback()
 
+    def clean_all_data(self):
+        db.session.query(Movie).delete()
+        db.session.commit()
+
     def __repr__(self):
         return json.dumps(self.short())
 
@@ -108,6 +112,10 @@ class Actor(db.Model):
 
     def rollback(self):
         db.session.rollback()
+
+    def clean_all_data(self):
+        db.session.query(Actor).delete()
+        db.session.commit()
 
     def __repr__(self):
         return json.dumps(self.short())

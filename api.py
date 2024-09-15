@@ -133,6 +133,9 @@ def update_actor(actor_id):
         abort(status=404)
 
     request_body = request.get_json()
+    if request_body is None:
+        abort(400)
+
     name = request_body.get('name', None)
     age = request_body.get('age', None)
     gender = request_body.get('gender', None)
@@ -165,6 +168,9 @@ def update_movie(movie_id):
         abort(status=404)
 
     request_body = request.get_json()
+    if request_body is None:
+        abort(400)
+
     title = request_body.get('title', None)
     release_date = request_body.get('release_date', None)
     if title is not None:
@@ -199,8 +205,10 @@ def update_movie(movie_id):
 @app.route('/actor/<actor_id>', methods=['DELETE'])
 @requires_auth(permission=PERMISSION_DELETE_ACTOR)
 def delete_actor(actor_id):
-    actor = Actor.query.filter(Actor.id == actor_id).one()
-    if actor is None:
+    try:
+        actor = Actor.query.filter(Actor.id == actor_id).one()
+    except (exc.NoResultFound, TypeError) as sql_error:
+        logging.error('Actor id %s is not found: %s', actor_id, repr(sql_error))
         abort(status=404)
     try:
         actor.delete()
@@ -215,8 +223,10 @@ def delete_actor(actor_id):
 @app.route('/movie/<movie_id>', methods=['DELETE'])
 @requires_auth(permission=PERMISSION_DELETE_MOVIE)
 def delete_movie(movie_id):
-    movie = Movie.query.filter(Movie.id == movie_id).one()
-    if movie is None:
+    try:
+        movie = Movie.query.filter(Movie.id == movie_id).one()
+    except (exc.NoResultFound, TypeError) as sql_error:
+        logging.error('Movie id %s is not found: %s', movie_id, repr(sql_error))
         abort(status=404)
     try:
         movie.delete()
